@@ -5,3 +5,4 @@ authors = ["Nic Hampton <nicolasjhampton@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+retry = "1.0.0"
