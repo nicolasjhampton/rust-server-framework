@@ -1,22 +1,28 @@
-use std::net::TcpListener;
-use retry::retry_with_index;
-use retry::delay::Fixed;
+mod network;
+use std::fs;
+use network::TcpStreamExt;
 
-fn get_conn() -> Result<std::net::TcpListener, retry::Error<String>> {
-    return retry_with_index(Fixed::from_millis(100), |index| {
-        match TcpListener::bind("127.0.0.1:7878") {
-            Ok(sock) => Ok(sock),
-            Err(e) => Err(format!("Failed {} times: {}", index, e))
+fn main() {
+    let mut server = network::Server::new();
+
+    server.run(|router| {
+        let mut found = false;
+        found = found || router.get("/", |stream| {
+            let contents = fs::read_to_string("index.html").unwrap();
+            stream.send_response(contents);
+        });
+
+        found = found || router.get("/dream", |stream| {
+            let contents = fs::read_to_string("sleep.html").unwrap();
+            stream.send_response(contents);
+        });
+
+        if !found {
+            router.hole(|stream| {
+                stream.send_404();
+            });
         }
     });
 }
 
-fn main() {
-    let listener = get_conn().unwrap();
 
-    for stream in listener.incoming() {
-        let stream = stream.unwrap();
-
-        println!("Connection established");
-    }
-}

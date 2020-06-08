@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 retry = "1.0.0"
+bytes = "0.5"
