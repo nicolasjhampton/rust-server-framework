@@ -3,31 +3,34 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::mpsc;
 use crate::utils::Job;
+use crate::utils::threadpool::Message;
 
 pub struct Worker {
-    id: usize,
-    thread: thread::JoinHandle<()>
+    pub id: usize,
+    pub thread: Option<thread::JoinHandle<()>>
 }
 
 impl Worker {
-    pub fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker { 
+    pub fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Message>>>) -> Worker { 
         let thread = thread::spawn(move || loop {
-            let job = receiver.lock().unwrap().recv().unwrap();
+            let message = receiver.lock().unwrap().recv().unwrap();
 
-            println!("Worker {} got a job; executing.", id);
+            match message {
+                Message::NewJob(job) => {
+                    println!("Worker {} got a job; executing.", id);
 
-            job();
+                    job();
+                }
+                Message::Terminate => {
+                    println!("Worker {} was told to terminate.", id);
+
+                    break;
+                }
+            }
         });
         Worker {
             id: id,
-            thread: thread
+            thread: Some(thread)
         }
     }
-
-    // pub fn run<C: 'static>(&mut self, closure: C)
-    // where
-    //     C: FnOnce() + Send + 'static
-    // {
-    //     self.thread = Some(thread::spawn(closure));
-    // }
 }

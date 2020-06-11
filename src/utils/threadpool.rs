@@ -7,11 +7,16 @@ use crate::utils::Job;
 use crate::utils::Worker;
 use crate::network::Router;
 
+pub enum Message {
+    NewJob(Job),
+    Terminate,
+}
+
+
 
 pub struct ThreadPool {
-    index: usize,
     workers: Vec<Worker>,
-    sender: mpsc::Sender<Job>
+    sender: mpsc::Sender<Message>
 }
 
 impl ThreadPool {
@@ -29,7 +34,6 @@ impl ThreadPool {
         }
 
         ThreadPool {
-            index: 0,
             workers,
             sender
         }
@@ -39,10 +43,27 @@ impl ThreadPool {
     where
         P: FnOnce(Router) + Send + 'static
     {   
-        let router = Router::new(tcp);
-        let job = Box::new(move || {
-            process(router);
+        let job = Box::new(|| {
+            process(Router::new(tcp));
         });
-        self.sender.send(job).unwrap();
+        self.sender.send(Message::NewJob(job)).unwrap();
+    }
+}
+
+impl Drop for ThreadPool {
+    fn drop(&mut self) {
+        println!("Sending terminate message to all workers.");
+
+        for _ in &self.workers {
+            self.sender.send(Message::Terminate).unwrap();
+        }
+
+        println!("Shutting down all workers.");
+        for worker in &mut self.workers {
+            println!("Shutting down worker {}", worker.id);
+            if let Some(thread) = worker.thread.take() {
+                thread.join().unwrap();
+            }
+        }
     }
 }
