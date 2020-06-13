@@ -1,8 +1,8 @@
-use retry::delay::Fixed;
-use retry::retry_with_index;
+mod utils;
+use utils::ThreadPool;
+use retry::{delay::Fixed, retry_with_index};
 use std::net::TcpListener;
 use crate::network::Router;
-use crate::utils::ThreadPool;
 
 pub struct Server {
     pool: ThreadPool,

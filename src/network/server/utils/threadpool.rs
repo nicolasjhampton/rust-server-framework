@@ -1,17 +1,10 @@
-use std::thread;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::mpsc;
 use std::net::TcpStream;
-use crate::utils::Job;
-use crate::utils::Worker;
+use super::worker::Worker;
+use super::message::Message;
 use crate::network::Router;
-
-pub enum Message {
-    NewJob(Job),
-    Terminate,
-}
-
 
 
 pub struct ThreadPool {

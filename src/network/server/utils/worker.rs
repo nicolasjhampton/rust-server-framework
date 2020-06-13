@@ -2,8 +2,8 @@ use std::thread;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::mpsc;
-use crate::utils::Job;
-use crate::utils::threadpool::Message;
+use super::message::Message;
+
 
 pub struct Worker {
     pub id: usize,
