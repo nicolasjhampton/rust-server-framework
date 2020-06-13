@@ -1,7 +1,6 @@
-mod http;
+use http::{Request, Response};
 use std::net::TcpStream;
-use http::request::Request;
-use http::response::Response;
+
 
 pub struct Router {
     request: Request,
