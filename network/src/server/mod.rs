@@ -2,7 +2,7 @@ mod utils;
 use utils::ThreadPool;
 use retry::{delay::Fixed, retry_with_index};
 use std::net::{TcpListener, TcpStream};
-use crate::network::Router;
+use router::Router;
 
 pub struct Server {
     pool: ThreadPool,

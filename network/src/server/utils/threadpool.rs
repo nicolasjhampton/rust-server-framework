@@ -5,7 +5,7 @@ use std::sync::mpsc;
 use std::net::TcpStream;
 use super::worker::Worker;
 use super::message::Message;
-use crate::network::Router;
+use router::Router;
 
 
 pub struct ThreadPool {
