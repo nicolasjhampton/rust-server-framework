@@ -6,6 +6,13 @@ version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "example"
+version = "0.1.0"
+dependencies = [
+ "network 0.1.0",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -87,13 +94,6 @@ name = "router"
 version = "0.1.0"
 dependencies = [
  "http 0.1.0",
-]
-
-[[package]]
-name = "rust-web-server"
-version = "0.1.0"
-dependencies = [
- "network 0.1.0",
 ]
 
 [[package]]
