@@ -30,7 +30,7 @@ fn main() {
         // router.mid("/", vec![Mid::auth, Mid::log]);
         // router.get("/", |_req, res| {
         //     let contents = fs::read_to_string("index.html").unwrap();
-        //     res.writer.send_200(contents);
+        //     res.send_200(contents);
         // });
         // router.mount("/users", users_router);
 
