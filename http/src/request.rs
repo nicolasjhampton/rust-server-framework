@@ -1,42 +1,47 @@
+use std::ops::Deref;
 use std::net::TcpStream;
-use std::io::{BufReader, BufRead};
+
+use std::io::{BufReader, BufRead, Read};
+use crate::headers::Headers;
+use crate::route::Route;
 
 
-pub struct Request {
-    pub reader: BufReader<TcpStream>,
-    pub headers: Vec<String>,
-    pub route: String
+#[derive(Debug)]
+pub struct Request<R> {
+    pub reader: BufReader<Box<R>>,
+    pub headers: Headers,
+    pub route: Route
 }
 
-impl Request {
-    pub fn new(stream: TcpStream) -> Request {
-        let mut reader = BufReader::new(stream);
-        let route = Request::read_route(&mut reader);
-        let headers = Request::read_headers(&mut reader);
+impl<R: Read> Request<R> {
+    pub fn new(reader: Box<R>) -> Request<R> {
+        let mut buf_reader = BufReader::new(reader);
+        let route: Route = Route::from(Request::unwind_route(&mut buf_reader));
+        let headers: Headers = Headers::from(Request::unwind_headers(&mut buf_reader));
         Request {
-            reader,
+            reader: buf_reader,
             route,
             headers,
         }
     }
 
-    fn read_route(reader: &mut BufReader<TcpStream>) -> String {
+    fn unwind_route(reader: &mut BufReader<Box<R>>) -> String {
         let mut route = String::new();
         reader.read_line(&mut route).unwrap();
         route
     }
 
-    fn read_headers(reader: &mut BufReader<TcpStream>) -> Vec<String> {
-        let mut headers = vec![];
+    fn unwind_headers(reader: &mut BufReader<Box<R>>) -> Vec<String> {
+        let mut raw_headers = vec![];
         loop {
             let mut header = String::new();
-            reader.read_line(&mut header).unwrap();
-            if header.as_str() != "\r\n" {
-                headers.push(header);
+            let length = reader.read_line(&mut header).unwrap();
+            if length != 0 && header.as_str() != "\r\n" {
+                raw_headers.push(header);
             } else {
                 break;
             }
         }
-        headers
+        raw_headers
     }
 }
