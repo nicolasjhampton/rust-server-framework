@@ -14,7 +14,7 @@ mod tests {
 
     #[test]
     fn a_request_can_be_made_with_any_reader() -> Result<(), std::io::Error> {
-        let mut vec: &[u8] = b"GET / HTTP\r\n\r\n";
+        let mut vec: &[u8] = b"GET / HTTP/1.1\r\n\r\n";
         let request = Request::new(Box::new(vec));
         Ok(())
     }
@@ -22,22 +22,22 @@ mod tests {
     #[test]
     #[should_panic(expected = r#"Invalid method used in request: JIVE"#)]
     fn a_request_panics_when_invalid_method_used() {
-        let mut route_without_path: &[u8] = b"JIVE / HTTP\r\n\r\n";
+        let mut route_without_path: &[u8] = b"JIVE / HTTP/1.1\r\n\r\n";
         let request = Request::new(Box::new(route_without_path));
     }
 
     #[test]
-    #[should_panic(expected = r#"Misformed route: ["GET", "HTTP"]"#)]
+    #[should_panic(expected = r#"Misformed route: ["GET", "HTTP/1.1"]"#)]
     fn a_request_panics_when_route_is_misformed() {
-        let mut route_without_path: &[u8] = b"GET HTTP\r\n\r\n";
+        let mut route_without_path: &[u8] = b"GET HTTP/1.1\r\n\r\n";
         let request = Request::new(Box::new(route_without_path));
     }
 
     #[test]
     fn trailing_whitespace_not_included_in_route() -> Result<(), std::io::Error> {
-        let mut vec: &[u8] = b"GET / HTTP\r\nheader: my header\r\n";
+        let mut vec: &[u8] = b"GET / HTTP/1.1\r\nheader: my header\r\n";
         let request = Request::new(Box::new(vec));
-        assert!(!request.route.protocol.contains("\r\n"));
+        assert!(!request.route.to_string().contains("\r\n"));
         Ok(())
     }
 

@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub enum Status {
     CODE1(u8),
     CODE2(u8),
