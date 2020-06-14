@@ -1,0 +1,27 @@
+env_files = [
+    "./variables.env",
+]
+
+[tasks.build]
+command = "cargo"
+args = ["build"]
+
+[tasks.test]
+command = "cargo"
+args = ["test"]
+
+[tasks.coverage]
+dependancies = [ "build", "test" ]
+command = "grcov"
+args = [
+    "./target/debug/",
+    "-s",
+    ".",
+    "-t",
+    "html",
+    "--llvm",
+    "--branch",
+    "--ignore-not-existing",
+    "-o",
+    "./target/debug/coverage/",
+]

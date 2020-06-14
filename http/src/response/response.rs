@@ -1,21 +1,30 @@
-use std::net::TcpStream;
 use std::io::{BufWriter, Write};
+use std::fmt;
+use super::Status;
 
-
-pub struct Response {
-    pub writer: BufWriter<TcpStream>
+pub struct Response<W: Write> {
+    pub writer: BufWriter<Box<W>>,
+    status: Option<Status>
 }
 
-impl Response {
-    pub fn new(stream: TcpStream) -> Response {
+impl<W: Write> Response<W> {
+    pub fn new(stream: Box<W>) -> Response<W> {
         let writer = BufWriter::new(stream);
         Response {
-            writer
+            writer,
+            status: None
+        }
+    }
+
+    fn get_status(&self) -> Status {
+        match self.status {
+            Some(status) => status,
+            None => Status::SUCCESS
         }
     }
 
     pub fn send_response(&mut self, response: String) {
-        self.writer.write_all(response.as_bytes()).unwrap();
+        write!(self.writer, "{}", response).unwrap();
         self.writer.flush().unwrap();
     }
 
@@ -31,3 +40,9 @@ impl Response {
         self.send_response(response);
     }
 }
+
+// impl fmt::Display for Response {
+//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+
+//     }
+// }

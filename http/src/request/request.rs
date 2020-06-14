@@ -1,9 +1,6 @@
-use std::ops::Deref;
-use std::net::TcpStream;
-
 use std::io::{BufReader, BufRead, Read};
 use crate::headers::Headers;
-use crate::route::Route;
+use super::Route;
 
 
 #[derive(Debug)]
@@ -23,6 +20,12 @@ impl<R: Read> Request<R> {
             route,
             headers,
         }
+    }
+
+    pub fn body(&mut self) -> String {
+        let mut body = String::new();
+        self.reader.read_to_string(&mut body).unwrap();
+        body
     }
 
     fn unwind_route(reader: &mut BufReader<Box<R>>) -> String {

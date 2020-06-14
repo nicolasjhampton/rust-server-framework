@@ -1,4 +1,4 @@
-use crate::method::Method;
+use super::Method;
 
 #[derive(Debug)]
 pub struct Route {

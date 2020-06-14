@@ -2,10 +2,11 @@ pub mod request;
 pub use request::Request;
 pub mod response;
 pub use response::Response;
-mod headers;
-mod route;
-mod method;
-pub use method::Method;
+pub mod headers;
+pub use headers::Headers;
+use response::Status;
+use request::Method;
+use request::Route;
 
 
 #[cfg(test)]
@@ -64,6 +65,14 @@ mod tests {
             Some(value) => assert_eq!(value, "noyabusiness"),
             _ => panic!("auth header key not found!")
         };
+    }
+
+    #[test]
+    fn body_can_be_retrieved_from_request() {
+        let mut vec: &[u8] = b"GET / HTTP/1.1\r\nauth: noyabusiness\r\n\r\nThis is the body\nandI don't have anything more\r\n";
+        let mut request = Request::new(Box::new(vec));
+        let body = request.body();
+        assert_eq!(body, "This is the body\nandI don\'t have anything more\r\n");
     }
 
     #[test]
