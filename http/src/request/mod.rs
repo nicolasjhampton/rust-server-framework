@@ -1,6 +1,10 @@
 pub mod method;
 pub mod route;
 pub mod request;
+pub mod uri;
+pub use uri::URI;
+pub mod query;
+pub use query::Query;
 pub use method::Method;
 pub use route::Route;
 pub use request::Request;
@@ -13,6 +17,28 @@ mod tests {
     use std::net::{TcpStream, TcpListener};
 
     #[test]
+    fn a_query_can_be_printed() {
+        let mut query = Query::from(String::new());
+        query.insert("query".to_string(), "what".into());
+        assert_eq!(format!("{}", query), "?query=what")
+    }
+
+    #[test]
+    fn a_query_can_be_made_from_a_string() {
+        let mut query_string = String::from("query=what&if=then");
+        let query = Query::from(query_string);
+        assert_eq!(*query.get("query").unwrap(), String::from("what"));
+        assert_eq!(*query.get("if").unwrap(), String::from("then"));
+    }
+
+    #[test]
+    fn a_uri_can_be_made_from_a_string() {
+        let mut uri_string = String::from("scheme://authority/path/path/path?query=what#fragment");
+        let uri = URI::from(uri_string);
+        assert_eq!(uri.fragment(), "fragment");
+    }
+
+    #[test]
     fn a_request_can_be_made_with_any_reader() -> Result<(), std::io::Error> {
         let mut vec: &[u8] = b"GET / HTTP/1.1\r\n\r\n";
         let request = Request::new(Box::new(vec));
@@ -22,15 +48,15 @@ mod tests {
     #[test]
     #[should_panic(expected = r#"Invalid method used in request: JIVE"#)]
     fn a_request_panics_when_invalid_method_used() {
-        let mut route_without_path: &[u8] = b"JIVE / HTTP/1.1\r\n\r\n";
-        let request = Request::new(Box::new(route_without_path));
+        let mut route_method_invalid: &[u8] = b"JIVE / HTTP/1.1\r\n\r\n";
+        let request = Request::new(Box::new(route_method_invalid));
     }
 
     #[test]
     #[should_panic(expected = r#"Misformed route: ["GET", "HTTP/1.1"]"#)]
     fn a_request_panics_when_route_is_misformed() {
-        let mut route_without_path: &[u8] = b"GET HTTP/1.1\r\n\r\n";
-        let request = Request::new(Box::new(route_without_path));
+        let mut route_without_uri: &[u8] = b"GET HTTP/1.1\r\n\r\n";
+        let request = Request::new(Box::new(route_without_uri));
     }
 
     #[test]

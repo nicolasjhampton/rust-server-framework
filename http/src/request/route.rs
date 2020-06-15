@@ -2,16 +2,17 @@ use std::fmt;
 use super::Method;
 use crate::Protocol;
 
+
 #[derive(Debug, Clone)]
 pub struct Route {
     method: Method,
-    path: String,
+    uri: String,
     protocol: Protocol,
 }
 
 impl Route {
-    pub fn matches(&self, path: &str) -> bool {
-        self.path == path
+    pub fn matches(&self, uri: &str) -> bool {
+        self.uri == uri
     }
 
     pub fn is_method(&self, method: Method) -> bool {
@@ -27,7 +28,7 @@ impl From<String> for Route {
         }
         Route {
             method: Method::new(parsed_route[0]),
-            path: parsed_route[1].to_string(),
+            uri: parsed_route[1].to_string(),
             protocol: Protocol::new(parsed_route[2]),
         }
     }
@@ -35,6 +36,6 @@ impl From<String> for Route {
 
 impl fmt::Display for Route {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} {} {}", self.method, self.path, self.protocol)
+        write!(f, "{} {} {}", self.method, self.uri, self.protocol)
     }
 }

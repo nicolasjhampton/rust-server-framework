@@ -1,6 +1,7 @@
 use std::fmt;
 use std::ops::Deref;
 
+
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub enum Method {
     GET,
