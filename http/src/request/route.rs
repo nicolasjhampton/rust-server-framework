@@ -1,17 +1,18 @@
-use crate::method::Method;
+use std::fmt;
+use super::Method;
+use crate::Protocol;
 
-#[derive(Debug)]
+
+#[derive(Debug, Clone)]
 pub struct Route {
     method: Method,
-    path: String,
-    pub protocol: String,
+    uri: String,
+    protocol: Protocol,
 }
 
 impl Route {
-    pub fn matches(&self, path: &str) -> bool {
-        let let_through = self.path == path;
-        println!("let_through: {} starts with {} -> {:?}", self.path, path, let_through);
-        let_through
+    pub fn matches(&self, uri: &str) -> bool {
+        self.uri == uri
     }
 
     pub fn is_method(&self, method: Method) -> bool {
@@ -27,8 +28,14 @@ impl From<String> for Route {
         }
         Route {
             method: Method::new(parsed_route[0]),
-            path: parsed_route[1].to_string(),
-            protocol: parsed_route[2].to_string(),
+            uri: parsed_route[1].to_string(),
+            protocol: Protocol::new(parsed_route[2]),
         }
+    }
+}
+
+impl fmt::Display for Route {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} {} {}", self.method, self.uri, self.protocol)
     }
 }
