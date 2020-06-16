@@ -5,6 +5,8 @@ pub mod uri;
 pub use uri::URI;
 pub mod query;
 pub use query::Query;
+pub mod path;
+pub use path::Path;
 pub use method::Method;
 pub use route::Route;
 pub use request::Request;
@@ -15,6 +17,22 @@ mod tests {
     use super::*;
     use std::io::prelude::*;
     use std::net::{TcpStream, TcpListener};
+
+    #[test]
+    fn a_path_can_be_printed() {
+        let mut path = Path::from(String::new());
+        path.push("this".to_string());
+        path.push("is".to_string());
+        path.push("the".to_string());
+        path.push("way".to_string());
+        assert_eq!(format!("{}", path), "/this/is/the/way")
+    }
+
+    #[test]
+    fn a_path_can_be_created_from_a_string() {
+        let mut path = Path::from(String::from("/this/is/the/way"));
+        assert_eq!(format!("{}", path), "/this/is/the/way")
+    }
 
     #[test]
     fn a_query_can_be_printed() {
@@ -32,9 +50,22 @@ mod tests {
     }
 
     #[test]
-    fn a_uri_can_be_made_from_a_string() {
-        let mut uri_string = String::from("scheme://authority/path/path/path?query=what#fragment");
+    fn a_uri_can_be_printed() {
+        let mut uri_string = String::from("scheme://authority/path0/path1/path2?query=what#fragment");
         let uri = URI::from(uri_string);
+        assert_eq!(format!("{}", uri), "scheme://authority/path0/path1/path2?query=what#fragment")
+    }
+
+    #[test]
+    fn a_uri_can_be_made_from_a_string() {
+        let mut uri_string = String::from("scheme://authority/path0/path1/path2?query=what#fragment");
+        let uri = URI::from(uri_string);
+        assert_eq!(uri.scheme(), "scheme");
+        assert_eq!(uri.authority(), "authority");
+        for (num, path) in uri.path.iter().enumerate() {
+            assert_eq!(path, &(format!("path{}", num)));
+        }
+        assert_eq!(uri.query.get("query").unwrap(), "what");
         assert_eq!(uri.fragment(), "fragment");
     }
 
