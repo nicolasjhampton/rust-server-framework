@@ -1,5 +1,4 @@
 use std::io::{BufWriter, Write};
-use std::fmt;
 use super::Status;
 
 pub struct Response<W: Write> {

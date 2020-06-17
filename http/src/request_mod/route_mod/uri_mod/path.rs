@@ -2,7 +2,19 @@ use std::fmt;
 use std::collections::VecDeque;
 use std::ops::{Deref, DerefMut};
 
+
+#[derive(Debug)]
 pub struct Path(VecDeque<String>);
+
+impl From<&str> for Path {
+    fn from(raw_path: &str) -> Self {
+        let path = raw_path
+            .split("/")
+            .filter_map(|x| if x != "" { Some(x.to_string()) } else { None })
+            .collect::<VecDeque<String>>();
+        Path(path)
+    }
+}
 
 impl From<String> for Path {
     fn from(raw_path: String) -> Self {

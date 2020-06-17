@@ -3,6 +3,7 @@ use std::ops::{Deref, DerefMut};
 use std::collections::HashMap;
 
 
+#[derive(Debug)]
 pub struct Query(HashMap<String, String>);
 
 impl Deref for Query {
@@ -26,10 +27,28 @@ impl From<String> for Query {
             if pair == "" {
                 continue
             }
-            let key_value = pair.split("=").collect::<Vec<&str>>();
+            let mut key_value = pair.split("=");
             query.insert(
-                key_value.first().unwrap().to_string(), 
-                key_value.last().unwrap().to_string()
+                key_value.next().unwrap().to_string(), 
+                key_value.next().unwrap().to_string()
+            );
+        }
+        Query(query)
+    } 
+}
+
+impl From<&str> for Query {
+    fn from(query_string: &str) -> Query {
+        let query_string = query_string.to_string();
+        let mut query = HashMap::new();
+        for pair in query_string.split("&") {
+            if pair == "" {
+                continue
+            }
+            let mut key_value = pair.split("=");
+            query.insert(
+                key_value.next().unwrap().to_string(), 
+                key_value.next().unwrap().to_string()
             );
         }
         Query(query)
