@@ -1,5 +1,4 @@
 use std::fmt;
-use std::ops::Deref;
 
 
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
@@ -11,9 +10,22 @@ pub enum Method {
     DELETE
 }
 
-impl Method {
-    pub fn new(method: &str) -> Method {
+impl From<&str> for Method {
+    fn from(method: &str) -> Method {
         match method {
+            "GET" => Method::GET,
+            "POST" => Method::POST,
+            "PUT" => Method::PUT,
+            "PATCH" => Method::PATCH,
+            "DELETE" => Method::DELETE,
+            _ => panic!("Invalid method used in request: {}", method)
+        }
+    }
+}
+
+impl From<String> for Method {
+    fn from(method: String) -> Method {
+        match method.as_str() {
             "GET" => Method::GET,
             "POST" => Method::POST,
             "PUT" => Method::PUT,
