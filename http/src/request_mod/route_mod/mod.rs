@@ -32,4 +32,15 @@ mod tests {
         route.set_method(Method::POST);
         assert_eq!(format!("{}", route), "POST /log?format=json HTTP/1.1");
     }
+
+    #[test]
+    fn a_method_can_be_created_from_a_string() {
+        let method = Method::from("GET");
+        assert_eq!(format!("{}", method), "GET");
+    }
+
+    #[test]
+    fn a_method_can_be_printed() {
+        assert_eq!(format!("{}", Method::POST), "POST");
+    }
 }

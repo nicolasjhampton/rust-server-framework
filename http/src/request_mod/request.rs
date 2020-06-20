@@ -13,7 +13,7 @@ pub struct Request<R> {
 impl<R: Read> Request<R> {
     pub fn new(reader: Box<R>) -> Request<R> {
         let mut buf_reader = BufReader::new(reader);
-        let route: Route = Route::from(Request::unwind_route(&mut buf_reader));
+        let route: Route = Route::from(Request::unwind(&mut buf_reader));
         let headers: Headers = Headers::from(Request::unwind_headers(&mut buf_reader));
         Request {
             reader: buf_reader,
@@ -28,21 +28,20 @@ impl<R: Read> Request<R> {
         body
     }
 
-    fn unwind_route(reader: &mut BufReader<Box<R>>) -> String {
-        let mut route = String::new();
-        reader.read_line(&mut route).unwrap();
-        route
+    fn unwind(reader: &mut BufReader<Box<R>>) -> String {
+        let mut line = String::new();
+        reader.read_line(&mut line).unwrap();
+        line
     }
 
-    fn unwind_headers(reader: &mut BufReader<Box<R>>) -> Vec<String> {
-        let mut raw_headers = vec![];
+    fn unwind_headers(mut reader: &mut BufReader<Box<R>>) -> String {
+        let mut raw_headers = String::new();
         loop {
-            let mut header = String::new();
-            let length = reader.read_line(&mut header).unwrap();
-            if length != 0 && header.as_str() != "\r\n" {
-                raw_headers.push(header);
-            } else {
+            let line = Request::unwind(&mut reader);
+            if line.is_empty() || line == "\r\n" {
                 break;
+            } else {
+                raw_headers.push_str(format!("{}\n", line).as_str());
             }
         }
         raw_headers

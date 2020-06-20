@@ -30,6 +30,71 @@ mod tests {
     use super::*;
 
     #[test]
+    fn more_than_one_header_can_be_printed() {
+        let mut headers = Headers::new();
+        headers.insert("Host".to_string(), "localhost".to_string());
+        headers.insert("Accept".to_string(), "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8".to_string());
+        assert!(headers.to_string().contains("Host: localhost\n"));
+        assert!(headers.to_string().contains("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\n"));
+        assert_eq!(headers.to_string().lines().collect::<Vec<&str>>().len(), 2);
+    }
+
+    #[test]
+    fn header_can_be_printed() {
+        let mut headers = Headers::new();
+        headers.insert("Host".to_string(), "localhost".to_string());
+        assert_eq!(headers.to_string(), "Host: localhost\n");
+    }
+
+    #[test]
+    fn header_example_with_multiline() {
+        let headers = Headers::from(String::from("
+        Host: localhost
+        User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5)
+        Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)
+        Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+        Accept-Language: en-us,en;q=0.5
+        Accept-Encoding: gzip,deflate
+        Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+        Keep-Alive: 300
+        Connection: keep-alive
+        Referer: http://localhost/test.php
+        Content-Type: application/x-www-form-urlencoded
+        Content-Length: 43
+        "));
+        assert_eq!(headers.get("User-Agent").unwrap(), "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)");
+        assert_eq!(headers.get("Host").unwrap(), "localhost");
+        assert_eq!(headers.get("Content-Length").unwrap(), "43");
+        assert_eq!(headers.len(), 11);
+    }
+
+    #[test]
+    fn header_example() {
+        let headers = Headers::from(String::from("
+        Host: localhost
+        User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)
+        Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+        Accept-Language: en-us,en;q=0.5
+        Accept-Encoding: gzip,deflate
+        Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+        Keep-Alive: 300
+        Connection: keep-alive
+        Referer: http://localhost/test.php
+        Content-Type: application/x-www-form-urlencoded
+        Content-Length: 43
+        "));
+        assert_eq!(headers.get("Host").unwrap(), "localhost");
+        assert_eq!(headers.get("Content-Length").unwrap(), "43");
+        assert_eq!(headers.len(), 11);
+    }
+
+    #[test]
+    fn multiline_headers() {
+        let headers = Headers::from(String::from("Accept: gif\n png\n satelites\n\r\n"));
+        assert_eq!(headers.get("Accept").unwrap(), "gif png satelites");
+    }
+
+    #[test]
     #[should_panic(expected = r#""#)]
     fn an_invalid_protocol_panics() {
         let _request = Protocol::from("HTTPWHATWHAT");
@@ -37,7 +102,7 @@ mod tests {
 
     #[test]
     fn trailing_whitespace_not_included_in_headers() -> Result<(), std::io::Error> {
-        let vec: &[u8] = b"GET / HTTP/1.1\r\nheader: my header\r\n";
+        let vec: &[u8] = b"GET / HTTP/1.1\r\nheader: my header\n\r\n";
         let request = Request::new(Box::new(vec));
         for (header, value) in request.headers.iter() {
             assert!(!header.contains("\r\n") && !value.contains("\r\n"));
@@ -47,7 +112,7 @@ mod tests {
 
     #[test]
     fn header_can_be_retrieved_by_name() {
-        let vec: &[u8] = b"GET / HTTP/1.1\r\nauth: noyabusiness\r\n";
+        let vec: &[u8] = b"GET / HTTP/1.1\r\nauth: noyabusiness\n\r\n";
         let request = Request::new(Box::new(vec));
         match request.headers.get("auth") {
             Some(value) => assert_eq!(value, "noyabusiness"),
