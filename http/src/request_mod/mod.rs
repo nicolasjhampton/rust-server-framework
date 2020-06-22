@@ -19,6 +19,27 @@ mod tests {
     use std::io::prelude::*;
     use std::net::{TcpStream, TcpListener};
 
+    // #[test]
+    // fn a_request_can_be_printed()  -> Result<(), std::io::Error> {
+    //     let listener = TcpListener::bind(&("127.0.0.1", 7879))?;
+    //     let mut stream = TcpStream::connect(&("localhost", 7879)).unwrap();
+    //     stream.write(b"HTTP/1.1 200 OK
+    //     Date: Mon, 19 Jul 2004 16:18:20 GMT
+    //     Server: Apache
+    //     Last-Modified: Sat, 10 Jul 2004 17:29:19 GMT
+    //     Accept-Ranges: bytes
+    //     Content-Length: 9328
+    //     Connection: close
+    //     Content-Type: text/html
+    
+    //     <HTML>
+    //     <HEAD>").unwrap();
+    //     let instream = listener.accept()?.0;
+    //     let request = Request::new(Box::new(instream));
+    //     println!("{}", request);
+    //     Ok(())
+    // }
+
     #[test]
     fn a_request_can_be_made_with_any_reader() -> Result<(), std::io::Error> {
         let vec: &[u8] = b"GET / HTTP/1.1\r\n\r\n";
