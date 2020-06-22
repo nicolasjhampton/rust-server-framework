@@ -30,6 +30,19 @@ mod tests {
     use super::*;
 
     #[test]
+    fn common_headers_print_in_set_order() {
+        let mut headers = Headers::new();
+        headers.insert("Referer".to_string(), "http://localhost/test.php".to_string());
+        headers.insert("Connection".to_string(), "keep-alive".to_string());
+        headers.insert("Content-Type".to_string(), "application/x-www-form-urlencoded".to_string());
+        headers.insert("Accept".to_string(), "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8".to_string());
+        headers.insert("Host".to_string(), "localhost".to_string());
+        assert_eq!(headers.to_string(), 
+            "Host: localhost\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\nReferer: http://localhost/test.php\nContent-Type: application/x-www-form-urlencoded\nConnection: keep-alive\n"
+        );
+    }
+
+    #[test]
     fn more_than_one_header_can_be_printed() {
         let mut headers = Headers::new();
         headers.insert("Host".to_string(), "localhost".to_string());
@@ -48,7 +61,7 @@ mod tests {
 
     #[test]
     fn header_example_with_multiline() {
-        let headers = Headers::from(String::from("
+        let headers = Headers::from("
         Host: localhost
         User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5)
         Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)
@@ -61,7 +74,7 @@ mod tests {
         Referer: http://localhost/test.php
         Content-Type: application/x-www-form-urlencoded
         Content-Length: 43
-        "));
+        ");
         assert_eq!(headers.get("User-Agent").unwrap(), "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)");
         assert_eq!(headers.get("Host").unwrap(), "localhost");
         assert_eq!(headers.get("Content-Length").unwrap(), "43");

@@ -14,17 +14,56 @@ pub struct Headers(HashMap<String, String>);
 // the Header struct per 'a lifetime
 impl<'a> Headers {
     const GENERAL: &'a[&'a str] = &[
-        "Host"
+        "Connection",
+        "Upgrade",
+        "Upgrade-Insecure-Requests",
+        "Pragma",
+        "Cache-Control",
     ];
 
     const REQUEST: &'a[&'a str] = &[
-
+        "Host",
+        "User-Agent",
+        "Accept",
+        "Accept-Language",
+        "Accept-Encoding",
+        "Accept-Charset",
+        "DNT",
+        "Authorization",
+        "Proxy-Authorization",
+        "Origin",
+        "Referer",
+        "Cookie",
+        "If-Modified-Since",
+        "If-None-Match",
+        "If-Match",
+        "If-Range",
+        "If-Unmodified-Since",
+        "TE",
+        "Range",
+        "Max-Forwards",
+        "Expect",
+        "From",
     ];
 
     const RESPONSE: &'a[&'a str] = &[
-
+        "Location",
+        "vary",
+        "Server",
     ];
 
+    const ENTITY: &'a[&'a str] = &[
+        "Allow",
+        "Content-Encoding",
+        "Content-Language",
+        "Content-Length",
+        "Content-Type",
+        "Content-Location",
+        "Content-MD5",
+        "Content-Range",
+        "Expires",
+        "Last-Modified",
+    ];
 
     pub fn new() -> Headers {
         Headers(HashMap::new())
@@ -51,7 +90,7 @@ impl fmt::Display for Headers {
         let mut header_string = String::new();
 
         // Known headers in order
-        for group in [Headers::GENERAL, Headers::REQUEST, Headers::RESPONSE].iter() {
+        for group in [Headers::REQUEST, Headers::RESPONSE, Headers::ENTITY, Headers::GENERAL].iter() {
             for key in group.iter() {
                 if let Some(value) = self.get(key.to_owned()) {
                     write!(header_string, "{}: {}\n", key, value)?;

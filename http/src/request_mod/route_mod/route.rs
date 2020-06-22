@@ -78,8 +78,6 @@ impl From<&str> for Route {
 
 impl fmt::Display for Route {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        println!("route {:?}", self.protocol);
-        println!("route {}", self.protocol);
         write!(f, "{} {} {}", self.method, self.uri, self.protocol)
     }
 }
